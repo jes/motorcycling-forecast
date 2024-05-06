@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+date=$(date +%Y%m%d-%H%M%S)
+./grab | tee data/$date.html | ./parse | ./motorcycling > index.html.new && mv index.html.new public/index.html
+gzip data/$date.html
