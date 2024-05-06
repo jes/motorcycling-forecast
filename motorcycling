@@ -3,16 +3,93 @@
 use strict;
 use warnings;
 
+use DateTime::Format::Strptime;
+use File::Slurp;
 use JSON qw(decode_json);
 
 my $json = join('', <>);
 my $weather = decode_json($json);
 
+my $index = read_file('templates/index');
+my $entry = read_file('templates/entry');
+
+my $strp = DateTime::Format::Strptime->new(
+    pattern => '%Y-%m-%d',
+);
+
+my @entries;
 for my $i (0 .. @$weather-1) {
-    print "$weather->[$i]{dt}: " . score($weather, $i), "\n";
+    my ($date, $time) = split / /, $weather->[$i]{dt};
+    next if $time lt '07:00' || $time ge '20:00';
+    my ($status, $reason) = score($weather, $i);
+    my $dt = $strp->parse_datetime($date);
+    $date = $dt->strftime("%a %e %b");
+    push @entries, {
+        date => $date,
+        time => $time,
+        status => $status,
+        reason => $reason,
+    };
 }
+
+my @out;
+for (my $i = 0; $i < $#entries; $i++) {
+    my $e = $entries[$i];
+    my $f = $entries[$i+1];
+    my $endtime = $e->{time};
+    while ($e->{date} eq $f->{date} && $e->{status} eq $f->{status} && $e->{reason} eq $f->{reason}) {
+        $endtime = $f->{time};
+        $i++;
+        last if $i >= $#entries;
+        $f = $entries[$i+1];
+    }
+    if ($endtime ne $e->{time}) {
+        $e->{time} = "$e->{time} - $endtime";
+    }
+    push @out, $e;
+}
+@entries = @out;
+
+my $entrieshtml = '';
+my $lastdate;
+for my $e (@entries) {
+    my $date = $e->{date};
+    if ($lastdate && $date ne $lastdate) {
+        $entrieshtml .= "<hr>\n";
+    }
+    if (!$lastdate || $date ne $lastdate) {
+        $entrieshtml .= "<h3>$date</h3>\n";
+    }
+    $lastdate = $date;
+    $entrieshtml .= template($entry, $e);
+}
+
+print template($index, {entries => $entrieshtml});
 
 sub score {
     my ($weather, $i) = @_;
-    return $weather->[$i]->{temp}{data} <= 14 ? 'good' : 'bad';
+    my $sumprecip = 0;
+    for my $j ($i-6 .. $i+2) {
+        next if $j < 0 || $j >= @$weather || !defined $weather->[$j]{precip}{text};
+        if ($weather->[$j]{precip}{text} =~ /(\d+)/) {
+            $sumprecip += $1;
+        }
+    }
+
+    my $temp = $weather->[$i]{temp}{data};
+
+    my @bad;
+    push @bad, "cold" if $temp < 13;
+    push @bad, "wet" if $sumprecip > 80;
+    return ('bad', join(', ', @bad)) if @bad;
+    return ('good', '');
+}
+
+sub template {
+    my ($html, $fields) = @_;
+    $html =~ s/__TIME__/$fields->{time}/g;
+    $html =~ s/__STATUS__/$fields->{status}/g;
+    $html =~ s/__REASON__/$fields->{reason}/g;
+    $html =~ s/__ENTRIES__/$fields->{entries}/g;
+    return $html;
 }

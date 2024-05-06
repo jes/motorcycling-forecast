@@ -1,0 +1,62 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.forecast-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.forecast {
+    margin-top: 20px;
+}
+
+.forecast-entry {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forecast-entry:last-child {
+    border-bottom: none;
+}
+
+.time {
+    flex: 1;
+}
+
+.status {
+    flex: 0.5;
+    text-align: center;
+    font-weight: bold;
+}
+
+.details {
+    flex: 2;
+    text-align: right;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.bad {
+    background-color: #ffdddd;
+}
+
+.good {
+    background-color: #ddffdd;
+}

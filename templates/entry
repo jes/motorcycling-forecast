@@ -1,0 +1,4 @@
+            <div class="forecast-entry __STATUS__">
+                <span class="time">__TIME__</span>
+                <span class="details">__REASON__</span>
+            </div>
