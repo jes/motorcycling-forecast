@@ -12,6 +12,8 @@
         <div class="forecast">
             __ENTRIES__
         </div>
+        <hr>
+        By <a href="https://incoherency.co.uk/">James Stanley</a>.
     </div>
 </body>
 </html>
