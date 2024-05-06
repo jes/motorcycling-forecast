@@ -13,7 +13,6 @@ my $dom = Mojo::DOM->new($html);
 my %weather;
 
 for my $td ($dom->find('td')->each) {
-    # field is "precip" or "temp"
     if (($td->attr->{'data-test-label'}//'') =~ /^(\w+)-(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}):\d{2}Z$/) {
         my ($field, $date, $time) = ($1, $2, $3);
         my $dt = "$date $time";
@@ -33,7 +32,12 @@ for my $td ($dom->find('td')->each) {
     }
 }
 
-print encode_json(\%weather);
+my @out;
+for my $dt (sort keys %weather) {
+    $weather{$dt}{dt} = $dt;
+    push @out, $weather{$dt};
+}
+print encode_json(\@out);
 
 sub sanitise {
     my ($str) = @_;

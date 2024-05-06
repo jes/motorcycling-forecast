@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use JSON qw(decode_json);
+
+my $json = join('', <>);
+my $weather = decode_json($json);
+
+for my $i (0 .. @$weather-1) {
+    print "$weather->[$i]{dt}: " . score($weather, $i), "\n";
+}
+
+sub score {
+    my ($weather, $i) = @_;
+    return $weather->[$i]->{temp}{data} <= 14 ? 'good' : 'bad';
+}
