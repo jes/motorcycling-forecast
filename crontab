@@ -1,1 +1,1 @@
-49 * * * * jes cd /home/jes/weather && ./run
+49 * * * * jes cd /home/jes/motorcycling-forecast && ./run
