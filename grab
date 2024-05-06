@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use LWP::UserAgent;
+
+my $ua = LWP::UserAgent->new;
+$ua->agent('https://incoherency.co.uk/weather/');
+my $r = $ua->get('https://www.metoffice.gov.uk/weather/forecast/gcn4xd0mn');
+print $r->content;
