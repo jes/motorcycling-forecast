@@ -1,0 +1,1 @@
+49 * * * * jes cd /home/jes/weather && ./run
